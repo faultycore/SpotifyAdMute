@@ -20,6 +20,7 @@ int main()
 	DWORD cNumRead;                    // amount of inputs read                
 	EnumData spotify;                  // structure that saves some data related to spotify process/window
 
+	bool flKeyDown = false;            // flag to prevent AsyncKeyState from going crazy
 	bool flIsRunning = true;           // main loop flags
 	bool flFirstIteration = true;
 
@@ -50,6 +51,7 @@ int main()
 	SetConsoleMode(hConout, dwConsoleModeOut);
 
 	std::cout << "Press [esc] to exit" << std::endl;
+	std::cout << "Press [ctrl + right] or [ctrl + left] for next/previous track" << std::endl;
 	std::cout << "-------------------" << std::endl << std::endl;
 
 	// starting point for clock
@@ -166,6 +168,43 @@ int main()
 				flFirstIteration = false;
 		}
 
+		// handle input
+		// these key presses are supposed to be handled when even when console is not in focus, so AsyncKeyState is needed
+		bool ctrlRightPressed = GetAsyncKeyState(VK_LCONTROL) & GetAsyncKeyState(VK_RIGHT) & 0x8000;
+		bool ctrlLeftPressed = GetAsyncKeyState(VK_LCONTROL) & GetAsyncKeyState(VK_LEFT) & 0x8000;
+
+		if (ctrlRightPressed && flKeyDown == false)
+		{
+			INPUT input;
+			input.type = INPUT_KEYBOARD;
+			input.ki.dwExtraInfo = 0;
+			input.ki.dwFlags = 0;
+			input.ki.time = 0;
+			input.ki.wScan = 0;
+			input.ki.wVk = VK_MEDIA_NEXT_TRACK;
+
+			SendInput(1, &input, sizeof(INPUT));
+			flKeyDown = true;
+		}
+		else if (!ctrlRightPressed && !ctrlLeftPressed)
+			flKeyDown = false;
+
+		if (ctrlLeftPressed && flKeyDown == false)
+		{
+			INPUT input;
+			input.type = INPUT_KEYBOARD;
+			input.ki.dwExtraInfo = 0;
+			input.ki.dwFlags = 0;
+			input.ki.time = 0;
+			input.ki.wScan = 0;
+			input.ki.wVk = VK_MEDIA_PREV_TRACK;
+
+			SendInput(1, &input, sizeof(INPUT));
+			flKeyDown = true;
+		}
+		else if (!ctrlRightPressed && !ctrlLeftPressed)
+			flKeyDown = false;
+
 		// need to check if there are entries in the buffer 
 		// otherwise ReadConsoleInput blocks the execution of loop until there is
 		GetNumberOfConsoleInputEvents(hConin, &cConsoleInput);
@@ -191,62 +230,10 @@ int main()
 							SetConsoleMode(hConout, dwInitialConsoleModeOut);
 							std::wcout << std::endl << "exiting...";
 							break;
-					case 0x43:
-			                std::wcout << std::endl << "qwert";
-							break;
-					case VK_RIGHT:
-						if (ctrlk & 0x0008)
-						{
-							INPUT inRight;
-							inRight.type = INPUT_KEYBOARD;
-							inRight.ki.dwExtraInfo = 0;
-
-							//inRight.ki.dwFlags = KEYEVENTF_SCANCODE;
-							inRight.ki.dwFlags = 0;
-
-							inRight.ki.time = 0;
-
-							//inRight.ki.wScan = 0x4f;
-							inRight.ki.wScan = 0;
-
-							inRight.ki.wVk = VK_RIGHT;
-
-							INPUT inCtrl;
-							inCtrl.type = INPUT_KEYBOARD;
-							inCtrl.ki.dwExtraInfo = 0;
-
-							//inCtrl.ki.dwFlags = KEYEVENTF_SCANCODE;
-							inCtrl.ki.dwFlags = 0;
-
-							inCtrl.ki.time = 0;
-
-							//inCtrl.ki.wScan = 0xe0;
-							inCtrl.ki.wScan = 0;
-
-							inCtrl.ki.wVk = VK_LCONTROL;
-
-							INPUT inputs[2] = { inRight, inCtrl };
-							//if (SetForegroundWindow(spotify.hWnd))
-								//std::wcout << std::endl << "Success";
-							//SetFocus(spotify.hWnd);
-
-							PostMessage(spotify.hWnd, WM_KEYDOWN, MapVirtualKey(VK_LCONTROL, MAPVK_VK_TO_VSC), MapVirtualKey(VK_LCONTROL, MAPVK_VK_TO_VSC));
-							PostMessage(spotify.hWnd, WM_KEYDOWN, MapVirtualKey(VK_RIGHT, MAPVK_VK_TO_VSC), MapVirtualKey(VK_RIGHT, MAPVK_VK_TO_VSC));
-
-							HWND hwndForeground = GetForegroundWindow();
-							int length = GetWindowTextLength(hwndForeground);
-							wchar_t* buffer = new wchar_t[length];
-							GetWindowText(hwndForeground, buffer, length);
-							std::wcout << std::endl << std::endl << buffer;
-							delete[] buffer;
-							
-							SendInput(2, inputs, sizeof(INPUT));
-							std::wcout << std::endl << "asdf";
-						}
+					case 0x43:  // implement: options
+			                //std::wcout << std::endl << "options";
 							break;
 					}
-					break;
-
 					// disregard all other events
 				case MOUSE_EVENT:
 				case WINDOW_BUFFER_SIZE_EVENT:

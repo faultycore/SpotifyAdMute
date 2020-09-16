@@ -1,0 +1,11 @@
+﻿  audiocom.cpp
+  main.cpp
+  utility.cpp
+  wincallback.cpp
+D:\Meine Sachen\Programming\Microsoft Visual Studio\source\repos\spotify-ad-mute\spotify-ad-mute\wincallback.cpp(70,17): warning C4244: '=': conversion from 'DWORD' to 'WORD', possible loss of data
+  Generating code
+  216 of 221 functions (97.7%) were compiled, the rest were copied from previous compilation.
+    1 functions were new in current compilation
+    2 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  spotify-ad-mute.vcxproj -> D:\Meine Sachen\Programming\Microsoft Visual Studio\source\repos\spotify-ad-mute\x64\Release\spotify-ad-mute.exe
