@@ -51,7 +51,7 @@ BOOL CALLBACK EnumWindowsProc(HWND hWnd, LPARAM sptr)
 			std::wstring windowTitle(buffer);
 			spot->title.push_back(windowTitle);
 
-			if (windowTitle != L"GDI+ Window (Spotify.exe)" && windowTitle != L"MSCTFIME UI" && windowTitle != L"Default IME" && windowTitle != L"CSpNotify Notify Window")
+			if (windowTitle != L"GDI+ Window (Spotify.exe)" && windowTitle != L"MSCTFIME UI" && windowTitle != L"Default IME" && windowTitle != L"CSpNotify Notify Window" && windowTitle != L"G")
 				spot->hWnd = hWnd;
 
 			delete[] buffer;

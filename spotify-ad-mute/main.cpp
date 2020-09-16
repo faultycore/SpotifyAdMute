@@ -70,9 +70,9 @@ int main()
 			{
 				for (auto i = spotify.title.begin(); i != spotify.title.end(); ++i)  // loop through titles, need to find the "main" title
 				{
-					if (*i != L"GDI+ Window (Spotify.exe)" && *i != L"MSCTFIME UI" && *i != L"Default IME" && *i != L"CSpNotify Notify Window")  // these can all be disregarded
+					if (*i != L"GDI+ Window (Spotify.exe)" && *i != L"MSCTFIME UI" && *i != L"Default IME" && *i != L"CSpNotify Notify Window" && *i != L"G")  // these can all be disregarded
 					{
-						if (*i == L"Spotify Free")  // "Spotify Free" means that nothing is playing
+						if (*i == L"Spotify Free" || *i == L"Spotify Premium")  // "Spotify Free" means that nothing is playing
 							std::wcout << "\033[1APlaying: None" << "\033[K";
 						else if (*i == L"Advertisement" || *i == L"Spotify")  // "Advertisement" or "Spotify" mean that an advertisement is playing
 						{
