@@ -1,8 +1,0 @@
-﻿1>------ Build started: Project: spotify-ad-mute, Configuration: Release x64 ------
-1>Generating code
-1>1 of 221 functions ( 0.5%) were compiled, the rest were copied from previous compilation.
-1>  0 functions were new in current compilation
-1>  0 functions had inline decision re-evaluated but remain unchanged
-1>Finished generating code
-1>spotify-ad-mute.vcxproj -> D:\Meine Sachen\Programming\Microsoft Visual Studio\source\repos\spotify-ad-mute\spotify-ad-mute\x64\Release\spotify-ad-mute.exe
-========== Build: 1 succeeded, 0 failed, 0 up-to-date, 0 skipped ==========
