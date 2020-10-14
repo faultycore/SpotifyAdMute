@@ -2,9 +2,10 @@
 #include <string>
 #include <chrono>
 #include <vector>
+#include <thread>
 #include <Windows.h>
 #include "audiocom.h"
-#include "wincallback.h"
+#include "callback.h"
 #include "utility.h"
 
 int main()
@@ -70,7 +71,7 @@ int main()
 			{
 				for (auto i = spotify.title.begin(); i != spotify.title.end(); ++i)  // loop through titles, need to find the "main" title
 				{
-					if (*i != L"GDI+ Window (Spotify.exe)" && *i != L"MSCTFIME UI" && *i != L"Default IME" && *i != L"CSpNotify Notify Window" && *i != L"G")  // these can all be disregarded
+					if (*i != L"GDI+ Window (Spotify.exe)" && *i != L"MSCTFIME UI" && *i != L"Default IME" && *i != L"CSpNotify Notify Window" && *i != L"G" && *i != L"Drag")  // these can all be disregarded
 					{
 						if (*i == L"Spotify Free" || *i == L"Spotify Premium")  // "Spotify Free" means that nothing is playing
 							std::wcout << "\033[1APlaying: None" << "\033[K";
@@ -167,11 +168,11 @@ int main()
 			if (flFirstIteration)
 				flFirstIteration = false;
 		}
-
 		// handle input
 		// these key presses are supposed to be handled when even when console is not in focus, so AsyncKeyState is needed
 		bool ctrlRightPressed = GetAsyncKeyState(VK_LCONTROL) & GetAsyncKeyState(VK_RIGHT) & 0x8000;
 		bool ctrlLeftPressed = GetAsyncKeyState(VK_LCONTROL) & GetAsyncKeyState(VK_LEFT) & 0x8000;
+		bool ctrlSpacePressed = GetAsyncKeyState(VK_LCONTROL) & GetAsyncKeyState(VK_SPACE) & 0x8000;
 
 		if (ctrlRightPressed && flKeyDown == false)
 		{
@@ -186,10 +187,7 @@ int main()
 			SendInput(1, &input, sizeof(INPUT));
 			flKeyDown = true;
 		}
-		else if (!ctrlRightPressed && !ctrlLeftPressed)
-			flKeyDown = false;
-
-		if (ctrlLeftPressed && flKeyDown == false)
+		else if (ctrlLeftPressed && flKeyDown == false)
 		{
 			INPUT input;
 			input.type = INPUT_KEYBOARD;
@@ -202,7 +200,20 @@ int main()
 			SendInput(1, &input, sizeof(INPUT));
 			flKeyDown = true;
 		}
-		else if (!ctrlRightPressed && !ctrlLeftPressed)
+		else if (ctrlSpacePressed && flKeyDown == false)
+		{
+			INPUT input;
+			input.type = INPUT_KEYBOARD;
+			input.ki.dwExtraInfo = 0;
+			input.ki.dwFlags = 0;
+			input.ki.time = 0;
+			input.ki.wScan = 0;
+			input.ki.wVk = VK_MEDIA_PLAY_PAUSE;
+
+			SendInput(1, &input, sizeof(INPUT));
+			flKeyDown = true;
+		}
+		else if (!ctrlRightPressed && !ctrlLeftPressed && !ctrlSpacePressed)
 			flKeyDown = false;
 
 		// need to check if there are entries in the buffer 
@@ -212,7 +223,7 @@ int main()
 		{
 			// read input
 			ReadConsoleInput(hConin, irInputBuffer, 128, &cNumRead);
-			
+
 			// process input
 			for (DWORD i = 0; i < cNumRead; ++i)
 			{
@@ -225,14 +236,14 @@ int main()
 					switch (k)
 					{
 					case VK_ESCAPE:
-							flIsRunning = false;
-							SetConsoleMode(hConin, dwInitialConsoleModeIn);
-							SetConsoleMode(hConout, dwInitialConsoleModeOut);
-							std::wcout << std::endl << "exiting...";
-							break;
+						flIsRunning = false;
+						SetConsoleMode(hConin, dwInitialConsoleModeIn);
+						SetConsoleMode(hConout, dwInitialConsoleModeOut);
+						std::wcout << std::endl << "exiting...";
+						break;
 					case 0x43:  // implement: options
-			                //std::wcout << std::endl << "options";
-							break;
+							//std::wcout << std::endl << "options";
+						break;
 					}
 					// disregard all other events
 				case MOUSE_EVENT:
@@ -247,7 +258,9 @@ int main()
 				}
 			}
 		}
+		std::this_thread::sleep_for(std::chrono::milliseconds(16));
 	}
+
 
 	// return console to its initial state
 	SetConsoleCP(uiInitialConsoleCodePage);
