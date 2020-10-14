@@ -24,7 +24,7 @@
     <ClCompile Include="utility.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="wincallback.cpp">
+    <ClCompile Include="callback.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -35,7 +35,7 @@
     <ClInclude Include="utility.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="wincallback.h">
+    <ClInclude Include="callback.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

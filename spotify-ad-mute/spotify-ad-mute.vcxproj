@@ -142,12 +142,12 @@
     <ClCompile Include="audiocom.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="utility.cpp" />
-    <ClCompile Include="wincallback.cpp" />
+    <ClCompile Include="callback.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="audiocom.h" />
     <ClInclude Include="utility.h" />
-    <ClInclude Include="wincallback.h" />
+    <ClInclude Include="callback.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
