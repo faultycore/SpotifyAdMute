@@ -1,8 +1,5 @@
 ﻿  UI.cpp
-  audiocom.cpp
   callbacks.cpp
-  main.cpp
-  utility.cpp
-E:\Meine Sachen\Programming\Microsoft Visual Studio\source\repos\spotify-ad-mute\spotify-ad-mute\utility.cpp(37,17): warning C4244: "=": Konvertierung von "DWORD" in "WORD", möglicher Datenverlust
   Code wird generiert...
+  LINK : E:\Meine Sachen\Programming\Microsoft Visual Studio\source\repos\spotify-ad-mute\x64\Debug\spotify-ad-mute.exe wurde nicht gefunden oder beim letzten inkrementellen Linkvorgang nicht erstellt; vollständiger Link wird durchgeführt.
   spotify-ad-mute.vcxproj -> E:\Meine Sachen\Programming\Microsoft Visual Studio\source\repos\spotify-ad-mute\x64\Debug\spotify-ad-mute.exe
