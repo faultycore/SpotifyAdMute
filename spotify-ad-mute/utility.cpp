@@ -1,4 +1,4 @@
-#include "utility.h"
+#include "utility.hpp"
 
 VOID ErrorExit(LPCSTR lpsErrMessage)
 {
@@ -7,7 +7,7 @@ VOID ErrorExit(LPCSTR lpsErrMessage)
 	ExitProcess(0);
 }
 
-BOOL CheckForUnicodeCharacters(std::wstring str)
+BOOL ContainsUnicodeCharacters(std::wstring str)
 {
 	size_t length = str.size();
 
@@ -19,4 +19,28 @@ BOOL CheckForUnicodeCharacters(std::wstring str)
 			return true;
 	}
 	return false;
+}
+
+BOOL Contains(std::vector<std::wstring> v, std::wstring str)
+{
+	std::vector<std::wstring>::iterator it = find(v.begin(), v.end(), str);
+
+	if (it != v.end())
+		return true;
+	return false;
+}
+
+WORD GetKeyEvent(KEY_EVENT_RECORD ker, WORD* ctrlKey)
+{
+	if (ker.bKeyDown)
+	{
+		*ctrlKey = ker.dwControlKeyState;
+		return ker.wVirtualKeyCode;
+	}
+	else return 0;
+}
+
+void ShowOptions()
+{
+
 }

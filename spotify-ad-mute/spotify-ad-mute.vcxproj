@@ -141,13 +141,15 @@
   <ItemGroup>
     <ClCompile Include="audiocom.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="UI.cpp" />
     <ClCompile Include="utility.cpp" />
-    <ClCompile Include="callback.cpp" />
+    <ClCompile Include="callbacks.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="audiocom.h" />
-    <ClInclude Include="utility.h" />
-    <ClInclude Include="callback.h" />
+    <ClInclude Include="audiocom.hpp" />
+    <ClInclude Include="UI.hpp" />
+    <ClInclude Include="utility.hpp" />
+    <ClInclude Include="callbacks.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

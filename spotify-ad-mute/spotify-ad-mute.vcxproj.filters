@@ -24,18 +24,24 @@
     <ClCompile Include="utility.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="callback.cpp">
+    <ClCompile Include="callbacks.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="audiocom.h">
+    <ClInclude Include="callbacks.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="utility.h">
+    <ClInclude Include="audiocom.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="callback.h">
+    <ClInclude Include="utility.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UI.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

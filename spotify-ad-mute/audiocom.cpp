@@ -1,4 +1,4 @@
-#include "audiocom.h"
+#include "audiocom.hpp"
 
 // initializes COM library 
 // return value can be checked with SUCCEEDED() or FAILED() macro
@@ -23,7 +23,6 @@ HRESULT GetAudioSessionManager(IAudioSessionManager2** pSessionManager)
 
 	HRESULT hr = S_OK;
 
-	
 	if (SUCCEEDED(hr = CoCreateInstance(CLSID_MMDeviceEnumerator, NULL, CLSCTX_ALL, IID_IMMDeviceEnumerator, reinterpret_cast<void**>(&pDeviceEnumerator))))  // need device enumerator
 	{
 		if (SUCCEEDED(hr = pDeviceEnumerator->GetDefaultAudioEndpoint(eRender, eMultimedia, &pDevice)))  // get default audio device from enumerator
@@ -118,5 +117,42 @@ HRESULT EnumAudioSessions(IAudioSessionManager2* pSessionManager, ISimpleAudioVo
 	SafeRelease(&pSessionControl);
 	SafeRelease(&pSessionControl2);
 	SafeRelease(&pSessionList);
+	return hr;
+}
+
+HRESULT ChangeMuteStatus(const EnumData &spot, bool bShouldMute)
+{
+	HRESULT hr = S_OK;
+
+	for (int c = 0; c < spot.cDWProcessIDSize; c++)  // loop through all processes associated with Spotify, get their audio manager COM object and their mute audio
+	{
+		IAudioSessionManager2* pSessionManager = NULL;   // pointer to IAudioSessionManager2 COM interface
+		ISimpleAudioVolume* pAudioVolume = NULL;         // pointer to ISimpleAudioVolume COM interface
+
+		if (SUCCEEDED(hr = GetAudioSessionManager(&pSessionManager)))
+		{
+			if (SUCCEEDED(hr = EnumAudioSessions(pSessionManager, &pAudioVolume, spot.dwProcessID[c])))
+			{
+				if (pAudioVolume)
+					pAudioVolume->SetMute(bShouldMute, &GUID_NULL);
+					
+				SafeRelease(&pSessionManager);
+				SafeRelease(&pAudioVolume);		
+			}
+			else
+			{
+				SafeRelease(&pSessionManager);
+				SafeRelease(&pAudioVolume);
+				return hr;
+			}
+		}
+		else
+		{
+			SafeRelease(&pSessionManager);
+			SafeRelease(&pAudioVolume);
+			return hr;
+		}
+	}
+
 	return hr;
 }
