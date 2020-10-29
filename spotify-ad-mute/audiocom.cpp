@@ -1,4 +1,5 @@
 #include "audiocom.hpp"
+#include "utility.hpp"
 
 // initializes COM library 
 // return value can be checked with SUCCEEDED() or FAILED() macro
@@ -86,30 +87,16 @@ HRESULT EnumAudioSessions(IAudioSessionManager2* pSessionManager, ISimpleAudioVo
 							*pSimpleAudioVolume = pSimpleAudioVol;
 						}
 					}
-					else
-					{
-						CoTaskMemFree(pswSession);
-						SafeRelease(&pSessionControl);
-						SafeRelease(&pSessionControl2);
-						SafeRelease(&pSessionList);
-						return hr;
-					}
 				}
-				else
+
+				if (FAILED(hr))
 				{
-					CoTaskMemFree(pswSession);
 					SafeRelease(&pSessionControl);
 					SafeRelease(&pSessionControl2);
 					SafeRelease(&pSessionList);
 					return hr;
 				}
 			}
-
-			CoTaskMemFree(pswSession);
-			SafeRelease(&pSessionControl);
-			SafeRelease(&pSessionControl2);
-			SafeRelease(&pSessionList);
-			return hr;
 		}
 	}
 
@@ -120,33 +107,27 @@ HRESULT EnumAudioSessions(IAudioSessionManager2* pSessionManager, ISimpleAudioVo
 	return hr;
 }
 
-HRESULT ChangeMuteStatus(const EnumData &spot, bool bShouldMute)
+HRESULT ChangeMuteStatus(std::vector<DWORD> processIDs, bool bShouldMute)
 {
 	HRESULT hr = S_OK;
+	IAudioSessionManager2* pSessionManager = NULL;   // pointer to IAudioSessionManager2 COM interface
+	ISimpleAudioVolume* pAudioVolume = NULL;         // pointer to ISimpleAudioVolume COM interface
 
-	for (int c = 0; c < spot.cDWProcessIDSize; c++)  // loop through all processes associated with Spotify, get their audio manager COM object and their mute audio
+	for (int i = 0; i < processIDs.size(); i++)		 // loop through all processes associated with Spotify, get their audio manager COM object and their mute audio
 	{
-		IAudioSessionManager2* pSessionManager = NULL;   // pointer to IAudioSessionManager2 COM interface
-		ISimpleAudioVolume* pAudioVolume = NULL;         // pointer to ISimpleAudioVolume COM interface
+		SafeRelease(&pSessionManager);
+		SafeRelease(&pAudioVolume);
 
 		if (SUCCEEDED(hr = GetAudioSessionManager(&pSessionManager)))
 		{
-			if (SUCCEEDED(hr = EnumAudioSessions(pSessionManager, &pAudioVolume, spot.dwProcessID[c])))
+			if (SUCCEEDED(hr = EnumAudioSessions(pSessionManager, &pAudioVolume, processIDs[i])))
 			{
 				if (pAudioVolume)
 					pAudioVolume->SetMute(bShouldMute, &GUID_NULL);
-					
-				SafeRelease(&pSessionManager);
-				SafeRelease(&pAudioVolume);		
-			}
-			else
-			{
-				SafeRelease(&pSessionManager);
-				SafeRelease(&pAudioVolume);
-				return hr;
 			}
 		}
-		else
+
+		if (FAILED(hr))
 		{
 			SafeRelease(&pSessionManager);
 			SafeRelease(&pAudioVolume);
@@ -154,5 +135,7 @@ HRESULT ChangeMuteStatus(const EnumData &spot, bool bShouldMute)
 		}
 	}
 
+	SafeRelease(&pSessionManager);
+	SafeRelease(&pAudioVolume);
 	return hr;
 }

@@ -116,6 +116,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>E:\Meine Sachen\C++ Libs\boost_1_55_0</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -130,6 +131,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>E:\Meine Sachen\C++ Libs\boost_1_55_0</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -141,15 +143,27 @@
   <ItemGroup>
     <ClCompile Include="audiocom.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="spotify.cpp" />
     <ClCompile Include="UI.cpp" />
     <ClCompile Include="utility.cpp" />
     <ClCompile Include="callbacks.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="audiocom.hpp" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="spotify.hpp" />
     <ClInclude Include="UI.hpp" />
     <ClInclude Include="utility.hpp" />
     <ClInclude Include="callbacks.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="adv.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\..\..\..\..\Downloads\soundwave-icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="SpotifyAdMute.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

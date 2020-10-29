@@ -1,11 +1,13 @@
 #pragma once
 
+#include <Windows.h>
 #include <combaseapi.h>
 #include <audiopolicy.h>
 #include <mmdeviceapi.h>
-#include "utility.hpp"
+#include <vector>
 
-template <class T> void SafeRelease(T** ppT)
+template<class T> 
+void SafeRelease(T** ppT)
 {
 	if (*ppT)
 	{
@@ -17,4 +19,4 @@ template <class T> void SafeRelease(T** ppT)
 HRESULT InitializeCOM();
 HRESULT GetAudioSessionManager(IAudioSessionManager2**);
 HRESULT EnumAudioSessions(IAudioSessionManager2* pSessionManager, ISimpleAudioVolume**, DWORD);
-HRESULT ChangeMuteStatus(const EnumData&, bool);
+HRESULT ChangeMuteStatus(std::vector<DWORD>, bool);
