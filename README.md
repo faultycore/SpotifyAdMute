@@ -2,7 +2,7 @@
 Console application that mutes Spotify during an ad and unmutes as soon as the ad is finished.
 
 --------------
---DISCLAIMER--
+DISCLAIMER
 --
 Mainly this is a personal project for me to practice using the Win32 API and do something potentially useful in the process.
 I do not contend that this project is better than the apps already available for the purpose of automating Spotify that make use of the "new" Spotify web API (on the contrary).
