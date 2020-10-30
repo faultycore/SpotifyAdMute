@@ -104,11 +104,7 @@ void UI::HandleInput()
 					}
 					break;
 				case 0x33:
-					if (currentProgramState == OPTIONS_SCREEN)
-					{
-						ClearScreen();
-						currentProgramState = OPTION_ADDNAME;
-					}
+					break;
 				}
 			case WINDOW_BUFFER_SIZE_EVENT:
 				// For some reason the cursor needs to be hidden again after a window resize
@@ -185,7 +181,7 @@ void UI::PrintUI()
 		PrintOptionAsciiJam();
 		break;
 	case OPTION_ADDNAME:
-		//PrintOptionAddName();
+		PrintOptionAddName();
 		break;
 	default:
 		ErrorExit("Unknown UI state");
