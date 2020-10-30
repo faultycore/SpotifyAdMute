@@ -1,5 +1,5 @@
 # spotify-ad-mute
-Console application that mutes Spotify during an ad and unmutes as soon as the ad is finished.
+Console application that mutes Spotify during an ad and unmutes as soon as the ad is finished. It only works on Windows with the Spotify desktop app (not Spotify web).
 
 Disclaimer
 --
@@ -10,7 +10,6 @@ Due to the way this program works, if you download the binary, it will be flagge
 
 How it currently works
 --
-It only works on Windows with the Spotify desktop app (not Spotify web).
 
 The program scans the active processes to find the Spotify process, gets the handle to it and checks every 2 seconds for the title of the associated window(s). Since the main Spotify window is either called the title of the song that is playing or something else when an advertisement is playing, from that it can be determined if an advertisement is playing. The interval can be changed in the options, though options are not yet saved to any file.
 
