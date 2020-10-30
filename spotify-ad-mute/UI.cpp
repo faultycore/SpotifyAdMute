@@ -185,7 +185,7 @@ void UI::PrintUI()
 		PrintOptionAsciiJam();
 		break;
 	case OPTION_ADDNAME:
-		PrintOptionAddName();
+		//PrintOptionAddName();
 		break;
 	default:
 		ErrorExit("Unknown UI state");
@@ -244,7 +244,7 @@ void UI::PrintOptionsScreen()
 	std::wcout << "OPTIONS: " << std::endl;
 	std::wcout << "1. Interval       " << options.interval << " second(s)" << std::endl;
 	std::wcout << "2. ASCII Jam      " << options.asciiJam << std::endl;
-	std::wcout << "3. Add name";
+	//std::wcout << "3. Add name";
 }
 
 void UI::PrintOptionInterval()
