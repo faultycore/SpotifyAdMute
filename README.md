@@ -5,6 +5,7 @@ Disclaimer
 --
 Mainly this is a personal project for me to practice using the Win32 API and do something potentially useful in the process.
 There probably are better apps out there for the purpose of automating Spotify. Although I do plan to keep improving on this and eventually make use of the Spotify web API.
+
 Due to the way this program works, if you download the binary, it will be flagged as potentially dangerous by Windows and anti-virus software, but this is a false alarm. You can of course check the source code and compile it yourself, if for whatever reason you want to try this out instead of other options available.
 
 How it currently works
