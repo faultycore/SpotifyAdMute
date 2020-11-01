@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include <Windows.h>
+#include <audiopolicy.h>
 
 class Spotify
 {
@@ -15,30 +16,28 @@ public:
 	static const unsigned short NOTFOUND = 4;
 
 	Spotify();
+	~Spotify();
+	void HookSpotify();
 	void UpdateSpotifyProcessInfo();
 	void UpdateState();
-	void Clear();
 
-	void SetSongTitle(std::wstring songTitle) { this->songTitle = songTitle; }
-	void AddProcessID(DWORD processID) { this->processIDs.push_back(processID); }
-	void AddTitle(std::wstring title) { this->titles.push_back(title); }
+	void SetSpotifyTitle(std::wstring spotifyTitle) { this->spotifyTitle = spotifyTitle; }
+	void SetProcessID(DWORD processID) { this->processID = processID; }
 
-	auto GetSongTitle()	const { return songTitle; }
-	auto GetProcessIDs() const { return processIDs; }
-	auto GetTitles() const { return titles; }
-	auto GetTitlesIgnore() const { return titlesIgnore; }
+	auto GetSpotifyTitle()	const { return spotifyTitle; }
+	auto GetProcessID() const { return processID; }
 	auto GetTitlesAdvert() const { return titlesAdvert; }
 	auto GetTitlesNone() const { return titlesNone; }
 	auto GetState() const { return state; }
 
-private:
-	std::vector<std::wstring> titlesIgnore;  // Window names to ignore											           
+private:										           
 	std::vector<std::wstring> titlesAdvert;  // Window names that signify advertisement playing         
 	std::vector<std::wstring> titlesNone;    // Window names that signify nothing playing
 
-	std::wstring songTitle{};
-	std::vector<DWORD> processIDs{};
-	std::vector<std::wstring> titles{};
+	DWORD processID;
+	std::wstring spotifyTitle;
+
+	ISimpleAudioVolume* pAudioVolume;
 
 	int state;
 };

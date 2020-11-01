@@ -209,7 +209,7 @@ void UI::PrintMainScreen()
 		std::wcout << "Playing: Advertisement :(";
 		break;
 	case Spotify::SONG:
-		std::wcout << "Playing: " << spotify.GetSongTitle();
+		std::wcout << "Playing: " << spotify.GetSpotifyTitle();
 		break;
 	case Spotify::SONGUNI:
 		std::wcout << "Unable to display song title";

@@ -18,5 +18,5 @@ void SafeRelease(T** ppT)
 
 HRESULT InitializeCOM();
 HRESULT GetAudioSessionManager(IAudioSessionManager2**);
-HRESULT EnumAudioSessions(IAudioSessionManager2* pSessionManager, ISimpleAudioVolume**, DWORD);
-HRESULT ChangeMuteStatus(std::vector<DWORD>, bool);
+HRESULT EnumAudioSessions(ISimpleAudioVolume**, DWORD* processID);
+HRESULT ChangeMuteStatus(ISimpleAudioVolume*, bool);

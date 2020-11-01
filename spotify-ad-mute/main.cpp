@@ -21,6 +21,7 @@ int main()
 	auto timeStart = std::chrono::steady_clock::now();
 
 	UI ui(spotify, isRunning, timeStart);
+	spotify.HookSpotify();
 
 	// Main loop
 	while (isRunning)
@@ -31,9 +32,6 @@ int main()
 		{
 			spotify.UpdateSpotifyProcessInfo();
 			spotify.UpdateState();
-			
-			// Need to clear some data associated with Spotify process
-			spotify.Clear();
 
 			timeStart = timeNow;
 

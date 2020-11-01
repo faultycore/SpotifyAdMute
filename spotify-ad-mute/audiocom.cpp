@@ -1,3 +1,5 @@
+#include <Windows.h>
+#include <Psapi.h>
 #include "audiocom.hpp"
 #include "utility.hpp"
 
@@ -48,94 +50,93 @@ HRESULT GetAudioSessionManager(IAudioSessionManager2** pSessionManager)
 // takes a pointer to IAudioSessionManager2 object and a process ID, loops through the audio sessions of IAudioSessionManager2
 // and compares the process ID to sessID arg and writes a pointer to an associated ISimpleAudioVolume object to pSimpleAudio Volume if they match
 // return value can be checked with SUCCEEDED() or FAILED() macro
-HRESULT EnumAudioSessions(IAudioSessionManager2* pSessionManager, ISimpleAudioVolume** pSimpleAudioVolume, DWORD sessID)
+HRESULT EnumAudioSessions(ISimpleAudioVolume** pAudioVolume, DWORD* processID)
 {
-	if (!pSessionManager)
-		return E_INVALIDARG;
-
 	HRESULT hr = S_OK;
 
 	int cbSessionCount = 0;
 	LPWSTR pswSession = NULL;
 	DWORD sessionID;
 
+	IAudioSessionManager2* pSessionManager = NULL;
 	IAudioSessionEnumerator* pSessionList = NULL;
 	IAudioSessionControl* pSessionControl = NULL;
 	IAudioSessionControl2* pSessionControl2 = NULL;
 	ISimpleAudioVolume* pSimpleAudioVol = NULL;
 
-	if (SUCCEEDED(hr = pSessionManager->GetSessionEnumerator(&pSessionList)))
+	if (SUCCEEDED(hr = GetAudioSessionManager(&pSessionManager)))
 	{
-		if (SUCCEEDED(hr = pSessionList->GetCount(&cbSessionCount)))
+		if (SUCCEEDED(hr = pSessionManager->GetSessionEnumerator(&pSessionList)))
 		{
-			for (int i = 0; i < cbSessionCount; ++i)
+			if (SUCCEEDED(hr = pSessionList->GetCount(&cbSessionCount)))
 			{
-				CoTaskMemFree(pswSession);
-				SafeRelease(&pSessionControl);
-				SafeRelease(&pSessionControl2);
-
-				if (SUCCEEDED(hr = pSessionList->GetSession(i, &pSessionControl)))
+				for (int i = 0; i < cbSessionCount; ++i)
 				{
-					if (SUCCEEDED(hr = pSessionControl->GetDisplayName(&pswSession)))
-					{
-						pSessionControl->QueryInterface(&pSessionControl2);
-						pSessionControl2->GetProcessId(&sessionID);
-
-						if (sessionID == sessID)
-						{
-							pSessionControl->QueryInterface(__uuidof(ISimpleAudioVolume), (void**)&pSimpleAudioVol);
-							*pSimpleAudioVolume = pSimpleAudioVol;
-						}
-					}
-				}
-
-				if (FAILED(hr))
-				{
+					CoTaskMemFree(pswSession);
 					SafeRelease(&pSessionControl);
 					SafeRelease(&pSessionControl2);
-					SafeRelease(&pSessionList);
-					return hr;
+
+					if (SUCCEEDED(hr = pSessionList->GetSession(i, &pSessionControl)))
+					{
+						if (SUCCEEDED(hr = pSessionControl->GetDisplayName(&pswSession)))
+						{
+							pSessionControl->QueryInterface(&pSessionControl2);
+							pSessionControl2->GetProcessId(&sessionID);
+
+							HANDLE handle = OpenProcess(
+								PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,
+								FALSE,
+								sessionID
+							);
+
+							if (handle)
+							{
+								wchar_t processName[50];
+								if (!GetModuleBaseName(handle, 0, processName, 50))
+								{
+									ErrorExit("Failed to retrieve module name");
+								}
+
+								std::wstring name(processName);
+								if (name == L"Spotify.exe")
+								{
+									pSessionControl->QueryInterface(__uuidof(ISimpleAudioVolume), (void**)&pSimpleAudioVol);
+									*pAudioVolume = pSimpleAudioVol;
+						
+									*processID = sessionID;
+								}
+							}
+						}
+					}
+
+					if (FAILED(hr))
+					{
+						SafeRelease(&pSessionManager);
+						SafeRelease(&pSessionControl);
+						SafeRelease(&pSessionControl2);
+						SafeRelease(&pSessionList);
+						return hr;
+					}
 				}
 			}
 		}
 	}
 
 	CoTaskMemFree(pswSession);
+	SafeRelease(&pSessionManager);
 	SafeRelease(&pSessionControl);
 	SafeRelease(&pSessionControl2);
 	SafeRelease(&pSessionList);
 	return hr;
 }
 
-HRESULT ChangeMuteStatus(std::vector<DWORD> processIDs, bool bShouldMute)
-{
-	HRESULT hr = S_OK;
-	IAudioSessionManager2* pSessionManager = NULL;   // pointer to IAudioSessionManager2 COM interface
-	ISimpleAudioVolume* pAudioVolume = NULL;         // pointer to ISimpleAudioVolume COM interface
-
-	for (int i = 0; i < processIDs.size(); i++)		 // loop through all processes associated with Spotify, get their audio manager COM object and their mute audio
-	{
-		SafeRelease(&pSessionManager);
-		SafeRelease(&pAudioVolume);
-
-		if (SUCCEEDED(hr = GetAudioSessionManager(&pSessionManager)))
-		{
-			if (SUCCEEDED(hr = EnumAudioSessions(pSessionManager, &pAudioVolume, processIDs[i])))
-			{
-				if (pAudioVolume)
-					pAudioVolume->SetMute(bShouldMute, &GUID_NULL);
-			}
-		}
-
-		if (FAILED(hr))
-		{
-			SafeRelease(&pSessionManager);
-			SafeRelease(&pAudioVolume);
-			return hr;
-		}
-	}
-
-	SafeRelease(&pSessionManager);
-	SafeRelease(&pAudioVolume);
-	return hr;
+HRESULT ChangeMuteStatus(ISimpleAudioVolume* pAudioVolume, bool shouldMute)
+{	
+	if (pAudioVolume)
+		pAudioVolume->SetMute(shouldMute, &GUID_NULL);
+	else
+		return E_FAIL;
+	
+	return S_OK;
 }
+
