@@ -1,52 +1,49 @@
 #include <chrono>
 #include <thread>
-#include "audiocom.hpp"
-#include "spotify.hpp"
-#include "UI.hpp"
-#include "utility.hpp"
+#include "Audiocom.hpp"
+#include "Spotify.hpp"
+#include "UserInterface.hpp"
+#include "Utility.hpp"
 
 int main()
-{
-	Spotify spotify;
-
-	// Main loop flags
-	bool isRunning = true;           
-	bool isFirstIteration = true;
-
+{    
 	// Initialize COM library
-	if (FAILED(InitializeCOM()))
-		ErrorExit("Failed to initialize COM");
+	if (FAILED(initialize_com()))
+		error_exit("Failed to initialize COM");
 
 	// Starting point for clock
 	auto timeStart = std::chrono::steady_clock::now();
 
-	UI ui(spotify, isRunning, timeStart);
-	spotify.HookSpotify();
+	Data data = Data();
+	Spotify spotify = Spotify(&data);
+	UserInterface ui = UserInterface(&data);
+	
+	spotify.update_spotify_proc_info();
+	spotify.update_state();
 
 	// Main loop
-	while (isRunning)
+	do
 	{	
 		// Only enumerate windows every x seconds
 		auto timeNow = std::chrono::steady_clock::now();
-		if ((timeNow - timeStart) >= std::chrono::seconds(ui.options.interval) || isFirstIteration)
-		{
-			spotify.UpdateSpotifyProcessInfo();
-			spotify.UpdateState();
+		if ((timeNow - timeStart) >= std::chrono::seconds(data.options().interval))
+		{	
+			spotify.procID = 0;
+			spotify.title = L"";
+
+			spotify.update_spotify_proc_info();
+			spotify.update_state();
 
 			timeStart = timeNow;
-
-			if (isFirstIteration)
-				isFirstIteration = false;
 		}
 
-		ui.SetTime(timeNow);
-		ui.PrintUI();
-		ui.HandleGlobalInput();
-		ui.HandleInput();
+		ui.handle_input();
+		ui.print_interface(false);
 
-		std::this_thread::sleep_for(std::chrono::milliseconds(80));
-	}
+		std::this_thread::sleep_for(std::chrono::milliseconds(150));
+	} while (ui.state() != EXIT);
 
 	CoUninitialize();
+
 	return 0;
 }

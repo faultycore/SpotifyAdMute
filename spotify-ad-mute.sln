@@ -5,8 +5,6 @@ VisualStudioVersion = 16.0.30413.136
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "spotify-ad-mute", "spotify-ad-mute\spotify-ad-mute.vcxproj", "{68B35EB6-C09B-4D66-9D02-875A840F00CB}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "setup", "setup\setup.vdproj", "{0815E485-CC17-4F23-947F-C8C780BB8582}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -23,12 +21,6 @@ Global
 		{68B35EB6-C09B-4D66-9D02-875A840F00CB}.Release|x64.Build.0 = Release|x64
 		{68B35EB6-C09B-4D66-9D02-875A840F00CB}.Release|x86.ActiveCfg = Release|Win32
 		{68B35EB6-C09B-4D66-9D02-875A840F00CB}.Release|x86.Build.0 = Release|Win32
-		{0815E485-CC17-4F23-947F-C8C780BB8582}.Debug|x64.ActiveCfg = Debug
-		{0815E485-CC17-4F23-947F-C8C780BB8582}.Debug|x64.Build.0 = Debug
-		{0815E485-CC17-4F23-947F-C8C780BB8582}.Debug|x86.ActiveCfg = Debug
-		{0815E485-CC17-4F23-947F-C8C780BB8582}.Release|x64.ActiveCfg = Release
-		{0815E485-CC17-4F23-947F-C8C780BB8582}.Release|x64.Build.0 = Release
-		{0815E485-CC17-4F23-947F-C8C780BB8582}.Release|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -2,42 +2,34 @@
 
 #include <vector>
 #include <string>
-#include <Windows.h>
 #include <audiopolicy.h>
+#include "Data.hpp"
 
 class Spotify
 {
 public:
-	static const unsigned short SPOTERROR = -1;
-	static const unsigned short NONE = 0;
-	static const unsigned short ADV = 1;
-	static const unsigned short SONG = 2;
-	static const unsigned short SONGUNI = 3;
-	static const unsigned short NOTFOUND = 4;
+	std::wstring title;
+	DWORD procID;
 
-	Spotify();
+	Spotify(Data *data);
+
 	~Spotify();
-	void HookSpotify();
-	void UpdateSpotifyProcessInfo();
-	void UpdateState();
 
-	void SetSpotifyTitle(std::wstring spotifyTitle) { this->spotifyTitle = spotifyTitle; }
-	void SetProcessID(DWORD processID) { this->processID = processID; }
+	void update_spotify_proc_info();
 
-	auto GetSpotifyTitle()	const { return spotifyTitle; }
-	auto GetProcessID() const { return processID; }
-	auto GetTitlesAdvert() const { return titlesAdvert; }
-	auto GetTitlesNone() const { return titlesNone; }
-	auto GetState() const { return state; }
+	void update_state();
 
-private:										           
-	std::vector<std::wstring> titlesAdvert;  // Window names that signify advertisement playing         
-	std::vector<std::wstring> titlesNone;    // Window names that signify nothing playing
+	int& state() { return _state; };
 
-	DWORD processID;
-	std::wstring spotifyTitle;
+private:
+	std::vector<std::wstring> _titlesAd;
+	std::vector<std::wstring> _titlesNone;
 
-	ISimpleAudioVolume* pAudioVolume;
+	ISimpleAudioVolume* _pAudioVolume;
 
-	int state;
+	int _state;
+
+	Data* _data;
+
+	void hook_spotify();
 };

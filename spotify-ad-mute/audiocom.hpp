@@ -1,13 +1,10 @@
 #pragma once
 
 #include <Windows.h>
-#include <combaseapi.h>
 #include <audiopolicy.h>
-#include <mmdeviceapi.h>
-#include <vector>
 
 template<class T> 
-void SafeRelease(T** ppT)
+void safe_release(T** ppT)
 {
 	if (*ppT)
 	{
@@ -16,7 +13,10 @@ void SafeRelease(T** ppT)
 	}
 }
 
-HRESULT InitializeCOM();
-HRESULT GetAudioSessionManager(IAudioSessionManager2**);
-HRESULT EnumAudioSessions(ISimpleAudioVolume**, DWORD* processID);
-HRESULT ChangeMuteStatus(ISimpleAudioVolume*, bool);
+HRESULT initialize_com();
+
+HRESULT audio_session_manager(IAudioSessionManager2**);
+
+HRESULT enum_audio_sessions(ISimpleAudioVolume**);
+
+HRESULT change_mute_status(ISimpleAudioVolume*, bool);

@@ -1,14 +1,13 @@
-#include "utility.hpp"
-//#include <boost/property_tree/json_parser.hpp>
+#include "Utility.hpp"
 
-void ErrorExit(LPCSTR lpsErrMessage)
+void error_exit(LPCSTR lpsErrMessage)
 {
 	std::cout << stderr << std::endl << lpsErrMessage;
 
 	ExitProcess(0);
 }
 
-bool ContainsUnicodeCharacters(std::wstring str)
+bool contains_unicode(std::wstring str)
 {
 	size_t length = str.size();
 
@@ -22,7 +21,7 @@ bool ContainsUnicodeCharacters(std::wstring str)
 	return false;
 }
 
-bool Contains(std::vector<std::wstring> v, std::wstring str)
+bool contains(std::vector<std::wstring> v, std::wstring str)
 {
 	std::vector<std::wstring>::iterator it = find(v.begin(), v.end(), str);
 
@@ -31,7 +30,7 @@ bool Contains(std::vector<std::wstring> v, std::wstring str)
 	return false;
 }
 
-WORD GetKeyEvent(KEY_EVENT_RECORD ker, WORD* ctrlKey)
+WORD get_key_event(KEY_EVENT_RECORD ker, WORD* ctrlKey)
 {
 	if (ker.bKeyDown)
 	{
@@ -41,12 +40,4 @@ WORD GetKeyEvent(KEY_EVENT_RECORD ker, WORD* ctrlKey)
 	else return 0;
 }
 
-void LoadConfig()
-{
-	// TODO
-}
 
-void SaveConfig()
-{
-	// TODO
-}

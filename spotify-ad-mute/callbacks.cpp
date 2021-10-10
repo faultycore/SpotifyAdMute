@@ -1,29 +1,48 @@
-#include "callbacks.hpp"
-#include "spotify.hpp"
-#include "utility.hpp"
+#include "Callbacks.hpp"
+#include "Spotify.hpp"
+#include "Utility.hpp"
 #include <Psapi.h>
 
 BOOL CALLBACK EnumWindowsProc(HWND hWnd, LPARAM sptr)
 {
-	Spotify* spot = reinterpret_cast<Spotify*>(sptr);
-	DWORD processID;
+	Spotify* data = reinterpret_cast<Spotify*>(sptr);
+	DWORD processId;
+	HANDLE handle;
 
-	if (!GetWindowThreadProcessId(hWnd, &processID))
-		ErrorExit("Error while getting process ID");
+	if (!GetWindowThreadProcessId(hWnd, &processId))
+		error_exit("Error while getting process ID");
 
-	if ((processID == spot->GetProcessID()) && IsWindowVisible(hWnd))
+	if (IsWindowVisible(hWnd))
 	{
-			int length = GetWindowTextLength(hWnd);
-			if (length != 0)
+		handle = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, processId);
+		if (handle)
+		{
+			wchar_t processName[50];
+			if (!GetModuleBaseName(handle, 0, processName, 50))
 			{
-				TCHAR* buffer = new TCHAR[length + (long long)1];
-				GetWindowText(hWnd, buffer, length + 1);
-				std::wstring windowTitle(buffer);
-				spot->SetSpotifyTitle(windowTitle);
-				delete[] buffer;
-
-				return FALSE;
+				error_exit("Failed to retrieve module name");
 			}
+
+			std::wstring name(processName);
+
+			if (name == L"Spotify.exe")
+			{
+				int length = GetWindowTextLength(hWnd);
+				if (length != 0)
+				{
+					TCHAR* buffer = new TCHAR[length + (long long)1];
+					GetWindowText(hWnd, buffer, length + 1);
+					std::wstring windowTitle(buffer);
+					data->title = windowTitle;
+					data->procID = processId;
+					delete[] buffer;
+
+					return FALSE;
+				}
+			}
+
+				CloseHandle(handle);
+		}
 	}
 	
 	return TRUE;

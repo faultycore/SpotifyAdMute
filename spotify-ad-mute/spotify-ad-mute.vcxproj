@@ -78,6 +78,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>D:\MeineSachen\C++ Libs;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -141,29 +142,44 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="audiocom.cpp" />
+    <ClCompile Include="AudioCom.cpp" />
+    <ClCompile Include="TextBlock.cpp" />
+    <ClCompile Include="Data.cpp" />
+    <ClCompile Include="Event.cpp" />
+    <ClCompile Include="ExitScreen.cpp" />
+    <ClCompile Include="InputBlock.cpp" />
+    <ClCompile Include="InterfaceElement.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="spotify.cpp" />
-    <ClCompile Include="UI.cpp" />
-    <ClCompile Include="utility.cpp" />
-    <ClCompile Include="callbacks.cpp" />
+    <ClCompile Include="MainScreen.cpp" />
+    <ClCompile Include="OptionScreen.cpp" />
+    <ClCompile Include="Screen.cpp" />
+    <ClCompile Include="Spotify.cpp" />
+    <ClCompile Include="UserInterface.cpp" />
+    <ClCompile Include="Utility.cpp" />
+    <ClCompile Include="Callbacks.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="audiocom.hpp" />
-    <ClInclude Include="resource.h" />
-    <ClInclude Include="spotify.hpp" />
-    <ClInclude Include="UI.hpp" />
-    <ClInclude Include="utility.hpp" />
-    <ClInclude Include="callbacks.hpp" />
+    <ClInclude Include="AudioCom.hpp" />
+    <ClInclude Include="TextBlock.h" />
+    <ClInclude Include="Data.hpp" />
+    <ClInclude Include="Event.hpp" />
+    <ClInclude Include="ExitScreen.h" />
+    <ClInclude Include="InputBlock.h" />
+    <ClInclude Include="InterfaceElement.h" />
+    <ClInclude Include="MainScreen.hpp" />
+    <ClInclude Include="OptionScreen.hpp" />
+    <ClInclude Include="Resource.h" />
+    <ClInclude Include="Screen.hpp" />
+    <ClInclude Include="Spotify.hpp" />
+    <ClInclude Include="UserInterface.hpp" />
+    <ClInclude Include="Utility.hpp" />
+    <ClInclude Include="Callbacks.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="adv.json" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\..\..\..\..\Downloads\soundwave-icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="SpotifyAdMute.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

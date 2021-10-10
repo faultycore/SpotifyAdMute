@@ -1,22 +1,23 @@
 #include <Windows.h>
 #include <Psapi.h>
-#include "audiocom.hpp"
-#include "utility.hpp"
+#include <mmdeviceapi.h>
+#include "AudioCom.hpp"
+#include "Utility.hpp"
 
-// initializes COM library 
-// return value can be checked with SUCCEEDED() or FAILED() macro
-HRESULT InitializeCOM()
+// Initializes COM library 
+// Return value can be checked with SUCCEEDED() or FAILED() macro
+HRESULT initialize_com()
 {
 	HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
 
 	return hr;
 }
 
-// writes an object of IAudioSessionManager2* type to pSessionManager arg
-// return value can be checked with SUCCEEDED() or FAILED() macro
-HRESULT GetAudioSessionManager(IAudioSessionManager2** pSessionManager)
+// Writes an object of IAudioSessionManager2* type to pSessionManager arg
+// Return value can be checked with SUCCEEDED() or FAILED() macro
+HRESULT audio_session_manager(IAudioSessionManager2** pSessionManager)
 {
-	// get GUIDs of COM class and interface
+	// Get GUIDs of COM class and interface
 	const CLSID CLSID_MMDeviceEnumerator = __uuidof(MMDeviceEnumerator);
 	const IID IID_IMMDeviceEnumerator = __uuidof(IMMDeviceEnumerator);
 
@@ -26,31 +27,31 @@ HRESULT GetAudioSessionManager(IAudioSessionManager2** pSessionManager)
 
 	HRESULT hr = S_OK;
 
-	if (SUCCEEDED(hr = CoCreateInstance(CLSID_MMDeviceEnumerator, NULL, CLSCTX_ALL, IID_IMMDeviceEnumerator, reinterpret_cast<void**>(&pDeviceEnumerator))))  // need device enumerator
+	if (SUCCEEDED(hr = CoCreateInstance(CLSID_MMDeviceEnumerator, NULL, CLSCTX_ALL, IID_IMMDeviceEnumerator, reinterpret_cast<void**>(&pDeviceEnumerator))))  // Need device enumerator
 	{
-		if (SUCCEEDED(hr = pDeviceEnumerator->GetDefaultAudioEndpoint(eRender, eMultimedia, &pDevice)))  // get default audio device from enumerator
+		if (SUCCEEDED(hr = pDeviceEnumerator->GetDefaultAudioEndpoint(eRender, eMultimedia, &pDevice)))  // Get default audio device from enumerator
 		{
-			if (SUCCEEDED(hr = pDevice->Activate(__uuidof(IAudioSessionManager2), 0, NULL, reinterpret_cast<void**>(&pAudioManager))))  // activate audio manager of default audio device
+			if (SUCCEEDED(hr = pDevice->Activate(__uuidof(IAudioSessionManager2), 0, NULL, reinterpret_cast<void**>(&pAudioManager))))  // Activate audio manager of default audio device
 			{
 				*pSessionManager = pAudioManager;
-				SafeRelease(&pDeviceEnumerator);
-				SafeRelease(&pDevice);
+				safe_release(&pDeviceEnumerator);
+				safe_release(&pDevice);
 
 				return hr;
 			}
 		}
 	}
 
-	SafeRelease(&pDeviceEnumerator);
-	SafeRelease(&pDevice);
-	SafeRelease(&pAudioManager);
+	safe_release(&pDeviceEnumerator);
+	safe_release(&pDevice);
+	safe_release(&pAudioManager);
 	return hr;
 }
 
-// takes a pointer to IAudioSessionManager2 object and a process ID, loops through the audio sessions of IAudioSessionManager2
+// Takes a pointer to IAudioSessionManager2 object and a process ID, loops through the audio sessions of IAudioSessionManager2
 // and compares the process ID to sessID arg and writes a pointer to an associated ISimpleAudioVolume object to pSimpleAudio Volume if they match
-// return value can be checked with SUCCEEDED() or FAILED() macro
-HRESULT EnumAudioSessions(ISimpleAudioVolume** pAudioVolume, DWORD* processID)
+// Return value can be checked with SUCCEEDED() or FAILED() macro
+HRESULT enum_audio_sessions(ISimpleAudioVolume** pAudioVolume)
 {
 	HRESULT hr = S_OK;
 
@@ -64,7 +65,7 @@ HRESULT EnumAudioSessions(ISimpleAudioVolume** pAudioVolume, DWORD* processID)
 	IAudioSessionControl2* pSessionControl2 = NULL;
 	ISimpleAudioVolume* pSimpleAudioVol = NULL;
 
-	if (SUCCEEDED(hr = GetAudioSessionManager(&pSessionManager)))
+	if (SUCCEEDED(hr = audio_session_manager(&pSessionManager)))
 	{
 		if (SUCCEEDED(hr = pSessionManager->GetSessionEnumerator(&pSessionList)))
 		{
@@ -73,8 +74,8 @@ HRESULT EnumAudioSessions(ISimpleAudioVolume** pAudioVolume, DWORD* processID)
 				for (int i = 0; i < cbSessionCount; ++i)
 				{
 					CoTaskMemFree(pswSession);
-					SafeRelease(&pSessionControl);
-					SafeRelease(&pSessionControl2);
+					safe_release(&pSessionControl);
+					safe_release(&pSessionControl2);
 
 					if (SUCCEEDED(hr = pSessionList->GetSession(i, &pSessionControl)))
 					{
@@ -94,7 +95,7 @@ HRESULT EnumAudioSessions(ISimpleAudioVolume** pAudioVolume, DWORD* processID)
 								wchar_t processName[50];
 								if (!GetModuleBaseName(handle, 0, processName, 50))
 								{
-									ErrorExit("Failed to retrieve module name");
+									error_exit("Failed to retrieve module name");
 								}
 
 								std::wstring name(processName);
@@ -103,7 +104,13 @@ HRESULT EnumAudioSessions(ISimpleAudioVolume** pAudioVolume, DWORD* processID)
 									pSessionControl->QueryInterface(__uuidof(ISimpleAudioVolume), (void**)&pSimpleAudioVol);
 									*pAudioVolume = pSimpleAudioVol;
 						
-									*processID = sessionID;
+									CloseHandle(handle);
+									CoTaskMemFree(pswSession);
+									safe_release(&pSessionManager);
+									safe_release(&pSessionControl);
+									safe_release(&pSessionControl2);
+									safe_release(&pSessionList);
+									return hr;
 								}
 							}
 						}
@@ -111,10 +118,12 @@ HRESULT EnumAudioSessions(ISimpleAudioVolume** pAudioVolume, DWORD* processID)
 
 					if (FAILED(hr))
 					{
-						SafeRelease(&pSessionManager);
-						SafeRelease(&pSessionControl);
-						SafeRelease(&pSessionControl2);
-						SafeRelease(&pSessionList);
+						
+						safe_release(&pSimpleAudioVol);
+						safe_release(&pSessionManager);
+						safe_release(&pSessionControl);
+						safe_release(&pSessionControl2);
+						safe_release(&pSessionList);
 						return hr;
 					}
 				}
@@ -123,14 +132,15 @@ HRESULT EnumAudioSessions(ISimpleAudioVolume** pAudioVolume, DWORD* processID)
 	}
 
 	CoTaskMemFree(pswSession);
-	SafeRelease(&pSessionManager);
-	SafeRelease(&pSessionControl);
-	SafeRelease(&pSessionControl2);
-	SafeRelease(&pSessionList);
+	safe_release(&pSimpleAudioVol);
+	safe_release(&pSessionManager);
+	safe_release(&pSessionControl);
+	safe_release(&pSessionControl2);
+	safe_release(&pSessionList);
 	return hr;
 }
 
-HRESULT ChangeMuteStatus(ISimpleAudioVolume* pAudioVolume, bool shouldMute)
+HRESULT change_mute_status(ISimpleAudioVolume* pAudioVolume, bool shouldMute)
 {	
 	if (pAudioVolume)
 		pAudioVolume->SetMute(shouldMute, &GUID_NULL);

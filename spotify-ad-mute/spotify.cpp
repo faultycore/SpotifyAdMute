@@ -1,65 +1,100 @@
-#include "spotify.hpp"
-#include "callbacks.hpp"
-#include "utility.hpp"
-#include "audiocom.hpp"
-#include <combaseapi.h>
+#include "Spotify.hpp"
+#include "Callbacks.hpp"
+#include "Utility.hpp"
+#include "Audiocom.hpp"
+#include "Event.hpp"
 
-Spotify::Spotify()
+Spotify::Spotify(Data *data) : _data(data)
 {
-	titlesAdvert.insert(titlesAdvert.end(), { L"Advertisement", L"Spotify" }); // Window names that signify advertisement playing  			
-	titlesNone.insert(titlesNone.end(), { L"Spotify Free", L"Spotify Premium" }); // Window names that signify nothing playing
+	_titlesAd = data->titlesAd();				//Window names meaning advertisement is playing         
+	_titlesNone = data->titlesNone();			//Window names meaning nothing is playing
 
-	pAudioVolume = NULL;
-	processID = 0;
-	state = -1;
+	_pAudioVolume = NULL;
+
+	_state = NONE;
 }
 
 Spotify::~Spotify()
 {
-	SafeRelease(&pAudioVolume);
+	safe_release(&_pAudioVolume);
 }
 
-void Spotify::HookSpotify()
+void Spotify::hook_spotify()
 {
-	EnumAudioSessions(&pAudioVolume, &processID);
+	enum_audio_sessions(&_pAudioVolume);
 }
 
-void Spotify::UpdateSpotifyProcessInfo()
+void Spotify::update_spotify_proc_info()
 {
 	EnumWindows(EnumWindowsProc, reinterpret_cast<LPARAM>(this));
 }
 
-void Spotify::UpdateState()
+void Spotify::update_state()
 {
-		if (spotifyTitle != L"")
-		{ 
-			if (Contains(titlesNone, spotifyTitle)) // Check if nothing is playing
-				state = NONE;
-			else if (Contains(titlesAdvert, spotifyTitle)) // Check if an advert is playing
-			{
-				if (FAILED(ChangeMuteStatus(this->pAudioVolume, true)))
-					ErrorExit("Error while trying to mute/unmute Spotify");
-				state = ADV;
-			}
-			else if (spotifyTitle.find(L"-") == spotifyTitle.npos) // A few advertisements (often for podcasts) change the window title. If the window title doesn't contain a dash it's an advertisement																   															   
-			{
-				if (FAILED(ChangeMuteStatus(this->pAudioVolume, true)))
-					ErrorExit("Error while trying to mute/unmute Spotify");
-				state = ADV;
-			}
-			else if (!ContainsUnicodeCharacters(spotifyTitle)) // Check if song title does not unicode characters (cannot be displayed by most consoles)
-			{
-				if (FAILED(ChangeMuteStatus(this->pAudioVolume, false)))
-					ErrorExit("Error while trying to mute/unmute Spotify");
-				state = SONG;
-			}
-			else // Song title contains unicode characters
-			{
-				if (FAILED(ChangeMuteStatus(this->pAudioVolume, false)))
-					ErrorExit("Error while trying to mute/unmute Spotify");
-				state = SONGUNI;
-			}
-		}	
-		else // If title is empty, Spotify process couldn't be found
-			state = NOTFOUND;
+	if (title != L"")
+	{
+		//Check if nothing is playing
+		if (contains(_titlesNone, title))
+		{
+			_state = NONE;
+			EventTypes::SpotifyStateChangeEvent.Raise(_state, title);
+		}
+
+		//Check if an advert is playing
+		else if (contains(_titlesAd, title))
+		{
+			if (_pAudioVolume == NULL)
+				enum_audio_sessions(&_pAudioVolume);
+
+			if (FAILED(change_mute_status(_pAudioVolume, true)))
+				error_exit("Error while trying to mute/unmute Spotify");
+			_state = ADV;
+			EventTypes::SpotifyStateChangeEvent.Raise(_state, title);
+		}
+
+		//Hack to try and catch really all advertisments
+		else if (title.find(L"-") == title.npos)
+		{
+			if (_pAudioVolume == NULL)
+				enum_audio_sessions(&_pAudioVolume);
+			
+			if (FAILED(change_mute_status(_pAudioVolume, true)))
+				error_exit("Error while trying to mute/unmute Spotify");
+			_state = ADV;
+			EventTypes::SpotifyStateChangeEvent.Raise(_state, title);
+		}
+
+		//Check if song title does not unicode characters (cannot be displayed by most consoles)
+		else if (!contains_unicode(title))
+		{
+			if (_pAudioVolume == NULL)
+				enum_audio_sessions(&_pAudioVolume);
+
+			if (FAILED(change_mute_status(_pAudioVolume, false)))
+				error_exit("Error while trying to mute/unmute Spotify");
+			_state = SONG;
+			EventTypes::SpotifyStateChangeEvent.Raise(_state, title);
+		}
+
+		//Song title contains unicode characters
+		else
+		{
+			if (_pAudioVolume == NULL)
+				enum_audio_sessions(&_pAudioVolume);
+
+			if (FAILED(change_mute_status(_pAudioVolume, false)))
+				error_exit("Error while trying to mute/unmute Spotify");
+			_state = SONGUNI;
+			EventTypes::SpotifyStateChangeEvent.Raise(_state, title);
+		}
+	}
+	//If title is empty, Spotify process couldn't be found
+	else
+	{
+		safe_release(&_pAudioVolume);
+
+		_state = NOTFOUND;
+		EventTypes::SpotifyStateChangeEvent.Raise(_state, title);
+	}
 }
+
