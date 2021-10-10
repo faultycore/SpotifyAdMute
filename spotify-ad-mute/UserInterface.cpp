@@ -83,9 +83,11 @@ void UserInterface::setup_console()
 	 _cursorInfo.bVisible = false;
 	 SetConsoleCursorInfo(_hConout, &_cursorInfo);
 
-	//Disable quick edit mode
-	DWORD consoleModeIn = ENABLE_EXTENDED_FLAGS | (_consoleInitialModeIn & ~ENABLE_QUICK_EDIT_MODE);
-	SetConsoleMode(_hConin, consoleModeIn);
+	 SetConsoleMode(_hConout, _consoleInitialModeOut | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
+	
+	 //Disable quick edit mode
+	 DWORD consoleModeIn = ENABLE_EXTENDED_FLAGS | (_consoleInitialModeIn & ~ENABLE_QUICK_EDIT_MODE);
+	 SetConsoleMode(_hConin, consoleModeIn);
 }
 
 void UserInterface::print_interface(bool forcePrint) const
@@ -95,7 +97,6 @@ void UserInterface::print_interface(bool forcePrint) const
 	else
 		_screens.at(_state)->print();
 }
-
 
 void UserInterface::handle_input() 
 {

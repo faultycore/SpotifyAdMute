@@ -7,7 +7,7 @@
 
 int main()
 {    
-	// Initialize COM library
+	// Initialize COM interface
 	if (FAILED(initialize_com()))
 		error_exit("Failed to initialize COM");
 
@@ -40,7 +40,7 @@ int main()
 		ui.handle_input();
 		ui.print_interface(false);
 
-		std::this_thread::sleep_for(std::chrono::milliseconds(150));
+		std::this_thread::sleep_for(std::chrono::milliseconds(80));
 	} while (ui.state() != EXIT);
 
 	CoUninitialize();

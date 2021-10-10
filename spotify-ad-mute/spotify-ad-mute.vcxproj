@@ -175,12 +175,6 @@
     <ClInclude Include="Utility.hpp" />
     <ClInclude Include="Callbacks.hpp" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="adv.json" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="..\..\..\..\..\..\Downloads\soundwave-icon.ico" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
